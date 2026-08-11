@@ -200,6 +200,7 @@ import {
   type DirectSshConnectedStateOrigin
 } from './direct-ssh-state-routing'
 import { isDirectSshReconnectCoordinatorRoutingEnabled } from './direct-ssh-reconnect-rollout'
+import { emitAutomationsChangedWindowEvent } from '@/lib/automations-changed-window-event'
 
 function getShortcutPlatform(): NodeJS.Platform {
   if (navigator.userAgent.includes('Mac')) {
@@ -1159,6 +1160,16 @@ export function useIpcEvents(): void {
         runtimeProjectRefreshScheduler.request(environmentId)
         return
       }
+      if (event.type === 'automationsChanged') {
+        // Why: without the environment the subscriber cannot tell which authority
+        // changed, and one host's edit would refetch every host in the catalog.
+        emitAutomationsChangedWindowEvent({
+          environmentId,
+          ...(event.selector ? { selector: event.selector } : {}),
+          ...(event.reason ? { reason: event.reason } : {})
+        })
+        return
+      }
       if (event.type === 'sshStateChanged') {
         applyRuntimeEnvironmentSshStateChanged(
           environmentId,
@@ -1255,6 +1266,11 @@ export function useIpcEvents(): void {
     })
     const unsubscribeRuntimeEnvironmentStore = useAppStore.subscribe(
       handleRuntimeEnvironmentStoreWrite
+    )
+    // Why: the desktop authority publishes automation writes on its own channel;
+    // runtime authorities publish the same event over the client-event stream.
+    unsubs.push(
+      window.api.automations.onChanged((payload) => emitAutomationsChangedWindowEvent(payload))
     )
     // Subscribe before the first runtime stream starts: replay invalidation may
     // synchronously publish a tracked SSH bucket and relies on this listener to
