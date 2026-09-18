@@ -14,6 +14,7 @@ import {
   removeClaudeLivePtySessionId as removeClaudeLivePtySessionIdOperation,
   removeDeletedSshConfigAlias as removeDeletedSshConfigAliasOperation,
   removeRemovedSshTargetTombstone as removeRemovedSshTargetTombstoneOperation,
+  releaseRemovedSshTargetTombstone as releaseRemovedSshTargetTombstoneOperation,
   removeSshTarget as removeSshTargetOperation,
   updateSshTarget as updateSshTargetOperation
 } from '../leasing-ssh-ptys/ssh-target-state'
@@ -21,6 +22,7 @@ import {
   reassignSshTargetId as reassignSshTargetIdOperation,
   type SshTargetReassignmentOperations
 } from '../leasing-ssh-ptys/ssh-target-reassignment'
+import { allocateSshTargetGeneration as allocateSshTargetGenerationOperation } from '../scheduling-automations/automation-owner-projection'
 
 import type { StoreRuntimeState } from './store-runtime-state'
 import type { WriteSchedulingOperations } from './write-scheduling'
@@ -71,6 +73,13 @@ export class SshProfileOperations {
     removeSshTargetOperation(getSshTargetStateOperations(this), id)
   }
 
+  allocateSshTargetGeneration(): number {
+    const context = this[sshProfileOperationsContext]
+    return allocateSshTargetGenerationOperation(context.runtime.state, () =>
+      scheduleSave(context.scheduling)
+    )
+  }
+
   getClaudeLivePtySessionIds(): string[] {
     return getClaudeLivePtySessionIdsOperation(this[sshProfileOperationsContext].runtime.state)
   }
@@ -107,6 +116,10 @@ export class SshProfileOperations {
     addRemovedSshTargetTombstoneOperation(getSshTargetStateOperations(this), tombstone)
   }
 
+  releaseRemovedSshTargetTombstone(oldTargetId: string): void {
+    releaseRemovedSshTargetTombstoneOperation(getSshTargetStateOperations(this), oldTargetId)
+  }
+
   removeRemovedSshTargetTombstone(oldTargetId: string): void {
     removeRemovedSshTargetTombstoneOperation(getSshTargetStateOperations(this), oldTargetId)
   }
@@ -133,7 +146,7 @@ export function getSshTargetStateOperations(owner: SshProfileOperations): SshTar
 }
 
 export function installSshProfileOperationsContext(
-  target: object,
+  target: SshProfileOperations,
   source: SshProfileOperations
 ): void {
   Object.defineProperty(target, sshProfileOperationsContext, {

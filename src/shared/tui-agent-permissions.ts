@@ -29,7 +29,8 @@ export const YOLO_TUI_AGENT_ARGS: Partial<Record<TuiAgent, string>> = {
   devin: '--permission-mode bypass',
   junie: '--brave',
   ante: '--yolo',
-  trae: '--yolo'
+  trae: '--yolo',
+  droid: '--auto high'
 }
 
 export const YOLO_TUI_AGENT_ENV: Partial<Record<TuiAgent, Record<string, string>>> = {

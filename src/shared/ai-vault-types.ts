@@ -18,6 +18,7 @@ export const AI_VAULT_AGENTS = [
   'openclaw',
   'devin',
   'droid',
+  'cline',
   'kimi',
   'junie'
 ] as const satisfies readonly TuiAgent[]
@@ -60,6 +61,7 @@ export const AI_VAULT_AGENT_LABELS = {
   openclaw: 'OpenClaw',
   devin: 'Devin',
   droid: 'Droid',
+  cline: 'Cline',
   kimi: 'Kimi',
   junie: 'Junie'
 } as const satisfies Record<AiVaultAgent, string>
@@ -120,6 +122,11 @@ export type AiVaultSession = {
   subagentTranscriptCount: number
   resumeCommand: string
   subagent: AiVaultSessionSubagentInfo | null
+  /** Present only when the negotiated client can open the native structured owner. */
+  structuredSession?: {
+    sessionId: string
+    workspaceId: string
+  }
 }
 
 export type AiVaultSubagentListArgs = {
