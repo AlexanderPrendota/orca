@@ -166,6 +166,6 @@ export async function parseAgentSessionFile(
     case 'jcode':
       return parseJcodeSessionFile(candidate.file, platform, messages)
     case 'junie':
-      return parseJunieSessionFile(candidate.file, platform)
+      return parseJunieSessionFile(candidate.file, platform, messages)
   }
 }
