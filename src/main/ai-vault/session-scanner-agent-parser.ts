@@ -140,6 +140,6 @@ export async function parseAgentSessionFile(
     case 'kimi':
       return parseKimiSessionFile(candidate.file, platform, messages)
     case 'junie':
-      return parseJunieSessionFile(candidate.file, platform)
+      return parseJunieSessionFile(candidate.file, platform, messages)
   }
 }
