@@ -30,6 +30,8 @@ export type RemoteManagedHookInstallOptions = {
   deferTrustUntilConfigToml?: boolean
   /** Explicit GROK_HOME for remote runtimes that redirect Grok's config. */
   grokHomeDir?: string
+  /** Explicit JUNIE_HOME for remote runtimes that redirect Junie's config. */
+  junieHomeDir?: string
   /** Version reported by Claude on this execution host. */
   claudeVersion?: string
   /** Stops before starting the next installer when the owning relay request
@@ -89,7 +91,13 @@ const REMOTE_MANAGED_HOOK_INSTALLERS: readonly RemoteManagedHookInstaller[] = [
   ['zcode', (sftp, remoteHome) => zcodeHookService.installRemote(sftp, remoteHome)],
   ['dsh', (sftp, remoteHome) => dshHookService.installRemote(sftp, remoteHome)],
   ['jcode', (sftp, remoteHome) => jcodeHookService.installRemote(sftp, remoteHome)],
-  ['junie', (sftp, remoteHome) => junieHookService.installRemote(sftp, remoteHome)]
+  [
+    'junie',
+    (sftp, remoteHome, options) =>
+      junieHookService.installRemote(sftp, remoteHome, {
+        junieHomeDir: options?.junieHomeDir
+      })
+  ]
 ]
 
 /** Agents wired into the remote (SSH) hook installer. Exported so an invariant
