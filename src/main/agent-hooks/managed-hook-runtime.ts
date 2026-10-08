@@ -130,7 +130,6 @@ export async function installManagedHooks(options?: {
   const junieHomeDir = agents.includes('junie')
     ? await resolveRelayJunieHome(home, options?.signal)
     : undefined
-    : undefined
   options?.signal?.throwIfAborted()
   const hostIdentity = scopeManagedHookHostIdentity(
     await readManagedHookHostIdentity(),
